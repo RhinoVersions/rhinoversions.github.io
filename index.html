@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Download the latest Rhino versions - automatic weekly updates from NuGet">
+    <meta name="keywords" content="rhino, rhinoceros, 3d, cad, download, versions">
+    <title>Rhino Versions - Latest Downloads</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <div class="background-gradient"></div>
+
+    <header>
+        <div class="container">
+            <!-- Logo Removed -->
+            <h1>
+                Rhino Versions
+            </h1>
+            <p class="tagline">Automatic weekly updates from NuGet</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Latest Version Hero Section -->
+        <section id="latest-section" class="latest-section">
+            <div class="loading-state" id="loading-latest">
+                <div class="loader"></div>
+                <p>Loading latest version...</p>
+            </div>
+            <div class="error-state" id="error-latest" style="display: none;">
+                <p>Unable to load latest version data</p>
+            </div>
+            <div class="latest-card glass-card" id="latest-card" style="display: none;">
+                <div class="latest-badge">Latest Release</div>
+                <h2>Rhino <span id="latest-version">-</span></h2>
+                <div class="version-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Build Date</span>
+                        <span class="detail-value" id="latest-date">-</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Locale</span>
+                        <span class="detail-value">en-us</span>
+                    </div>
+                </div>
+                <div class="download-buttons">
+                    <a href="#" id="latest-download-windows" class="download-btn" target="_blank"
+                        rel="noopener noreferrer" style="display: none;">
+                        <span class="btn-icon">💻</span>
+                        Download for Windows
+                    </a>
+                    <a href="#" id="latest-download-mac" class="download-btn" target="_blank" rel="noopener noreferrer"
+                        style="display: none;">
+                        <span class="btn-icon">🍎</span>
+                        Download for Mac
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- All Versions Section -->
+        <section class="versions-section">
+            <div class="section-header">
+                <h2>All Versions</h2>
+                <div class="filters">
+                    <input type="text" id="search-input" class="search-input" placeholder="Search versions...">
+                    <select id="major-filter" class="filter-select">
+                        <option value="all">All Majors</option>
+                        <option value="8">Rhino 8</option>
+                        <option value="7">Rhino 7</option>
+                    </select>
+                    <select id="locale-filter" class="filter-select">
+                        <option value="all">All Languages</option>
+                        <option value="en-us" selected>English (US)</option>
+                        <option value="de-de">Deutsch</option>
+                        <option value="es-es">Español</option>
+                        <option value="fr-fr">Français</option>
+                        <option value="it-it">Italiano</option>
+                        <option value="ja-jp">日本語</option>
+                        <option value="ko-kr">한국어</option>
+                        <option value="zh-cn">中文 (简体)</option>
+                        <option value="zh-tw">中文 (繁體)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="loading-state" id="loading-all">
+                <div class="loader"></div>
+                <p>Loading version history...</p>
+            </div>
+            <div class="error-state" id="error-all" style="display: none;">
+                <p>Unable to load version history</p>
+            </div>
+
+            <div class="versions-table-container glass-card" id="versions-table-container" style="display: none;">
+                <table class="versions-table" id="versions-table">
+                    <thead>
+                        <tr>
+                            <th class="sortable" data-sort="version">
+                                Version
+                                <span class="sort-icon">↕</span>
+                            </th>
+                            <th class="sortable" data-sort="date">
+                                Build Date
+                                <span class="sort-icon">↕</span>
+                            </th>
+                            <th class="sortable" data-sort="major">
+                                Major
+                                <span class="sort-icon">↕</span>
+                            </th>
+                            <th>Language</th>
+                            <th>Downloads</th>
+                        </tr>
+                    </thead>
+                    <tbody id="versions-tbody">
+                        <!-- Populated by JavaScript -->
+                    </tbody>
+                </table>
+                <div class="table-footer">
+                    <p id="version-count">-</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>Updated weekly via <a href="https://github.com/rhinoversions/rhinoversions.github.io" target="_blank"
+                    rel="noopener noreferrer">GitHub Actions</a></p>
+            <p class="footer-note">Data sourced from <a href="https://www.nuget.org/packages/RhinoCommon"
+                    target="_blank" rel="noopener noreferrer">NuGet RhinoCommon</a></p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
