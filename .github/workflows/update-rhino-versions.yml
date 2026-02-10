@@ -1,9 +1,10 @@
-name: Update Rhino versions from NuGet (weekly)
+name: Update Rhino versions from NuGet (daily)
 
 on:
   schedule:
-    # Mondays at 09:10 UTC (adjust as needed)
-    - cron: "10 9 * * 1"
+    # Daily at 09:10 UTC (adjust as needed)
+    - cron: "10 9 * * *"
+
   workflow_dispatch:
 
 permissions:
