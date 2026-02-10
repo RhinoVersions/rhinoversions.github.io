@@ -1,3 +1,4 @@
+import argparse
 import datetime as dt
 import os
 import re
@@ -20,6 +21,7 @@ MD_LATEST = os.getenv("MD_PATH", "rhino-versions.md")
 MD_ALL = os.getenv("MD_PATH_ALL", "rhino-versions-all.md")
 HEAD_CHECK_LATEST = os.getenv("HEAD_CHECK_LATEST", "true").lower() == "true"
 HEAD_CHECK_ALL = os.getenv("HEAD_CHECK_ALL", "false").lower() == "true"
+MAC_HEAD_LIMIT = int(os.getenv("MAC_HEAD_LIMIT", "10"))  # Only HEAD-check Mac URLs for the N newest versions
 
 # Parse lists
 tokens = [t for t in re.split(r'[,\s]+', MAJORS_RAW.strip()) if t]
@@ -202,6 +204,48 @@ def write_all(md_path_all: str, entries: List[Tuple[str, str]]) -> int:
     return len(entries)
 
 
+def check_only():
+    """Lightweight check: is the latest NuGet version already in our data?"""
+    try:
+        reg = fetch_registration_index()
+        versions = versions_from_registration(reg)
+        stable = list_stable_for_majors(versions, MAJORS)
+
+        if not stable:
+            print("No stable versions found on NuGet.")
+            _write_output("new_versions", "false")
+            return
+
+        latest = stable[0]
+        print(f"Latest NuGet version: {latest}")
+
+        # Check if this version is already present in the latest MD file
+        if os.path.exists(MD_LATEST):
+            with open(MD_LATEST, "r", encoding="utf-8") as f:
+                content = f.read()
+            ver_fn = _version_for_filename(latest)
+            if ver_fn in content:
+                print(f"Version {latest} already listed in {MD_LATEST}. Nothing to do.")
+                _write_output("new_versions", "false")
+                return
+
+        print(f"New version {latest} detected! Full build required.")
+        _write_output("new_versions", "true")
+
+    except Exception as e:
+        print(f"::warning::Check failed ({e}), triggering full build to be safe.")
+        _write_output("new_versions", "true")
+
+
+def _write_output(key: str, value: str):
+    """Write a key=value pair to GITHUB_OUTPUT if available."""
+    out = os.environ.get("GITHUB_OUTPUT")
+    if out:
+        with open(out, "a", encoding="utf-8") as fh:
+            fh.write(f"{key}={value}\n")
+    print(f"  → {key}={value}")
+
+
 def main():
     latest_version = None
     latest_date_iso = None
@@ -262,27 +306,22 @@ def main():
                 
                 mac_candidates = build_mac_url_candidates(v)
                 valid_mac_url = None
-                
-                # Optimization: If HEAD_CHECK_ALL is False, maybe we only check the latest few?
-                # Or we just assume exact match? 
-                # The prompt implies we want to integrate them. 
-                # Let's try to check them. It might take a while for hundreds of versions.
-                # To be safe and fast(er), maybe we only check Mac for the latest 50?
-                # Or we just check them all. The workflow runs weekly.
-                
-                # Let's check candidates until one works.
-                for cand_url in mac_candidates:
-                    if url_exists(cand_url):
-                        valid_mac_url = cand_url
-                        break
-                
+
+                # Only HEAD-check Mac URLs for the newest N versions (per the loop order)
+                # For older versions, use exact-match URL without verification
+                version_index = stable.index(v)
+                if version_index < MAC_HEAD_LIMIT:
+                    for cand_url in mac_candidates:
+                        if url_exists(cand_url):
+                            valid_mac_url = cand_url
+                            break
+                else:
+                    # For old versions, assume exact match (first candidate)
+                    valid_mac_url = mac_candidates[0] if mac_candidates else None
+
                 if valid_mac_url:
                     fn = os.path.basename(urlparse(valid_mac_url).path)
                     all_entries_map[fn] = valid_mac_url
-                else:
-                    # If we didn't find a Mac version, we just don't list it for this version.
-                    # This is better than listing a broken link.
-                    pass
 
             # 3. Write all entries
             # Sort by version (descending), then by filename (to group locales)
@@ -382,5 +421,14 @@ def main():
             fh.write(f"all_count={all_count}\n")
             fh.write(f"changed={'true' if changed_latest else 'false'}\n")
 
+
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description="Fetch Rhino versions from NuGet")
+    parser.add_argument("--check-only", action="store_true",
+                        help="Only check if new versions exist, don't rebuild files")
+    args = parser.parse_args()
+
+    if args.check_only:
+        check_only()
+    else:
+        main()

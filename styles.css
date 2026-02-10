@@ -173,30 +173,61 @@ header h1 {
 }
 
 .latest-card {
-    padding: var(--spacing-lg);
+    padding: var(--spacing-xl);
+    /* Increased padding */
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-md);
+    gap: var(--spacing-lg);
+    /* More breathing room */
+    position: relative;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: #ffffff;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    /* Subtle lift */
 }
 
+/* Badge styling */
 .latest-badge {
     align-self: flex-start;
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    color: var(--color-text-secondary);
-    font-size: 0.625rem;
+    background: #FFFAE5;
+    /* Soft yellow bg */
+    border: 1px solid #FCD34D;
+    /* Stronger yellow border */
+    color: #92400E;
+    /* Dark amber text */
+    font-size: 0.75rem;
     font-weight: 700;
     text-transform: uppercase;
-    padding: 0.125rem 0.5rem;
+    letter-spacing: 0.05em;
+    padding: 0.25rem 0.75rem;
     border-radius: var(--radius-full);
 }
 
+/* Version Header */
 .latest-card h2 {
-    font-size: 1.5rem;
-    font-weight: 700;
+    font-size: 2rem;
+    /* Larger title */
+    font-weight: 800;
+    color: var(--color-text-primary);
+    line-height: 1.2;
+    margin: 0;
 }
 
+/* Details and Buttons Row */
 .version-details {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: flex-end;
+    /* Align bottom of text with buttons */
+    gap: var(--spacing-lg);
+    flex-wrap: wrap;
+    padding-top: var(--spacing-md);
+    border-top: 1px solid var(--color-border);
+}
+
+.details-group {
     display: flex;
     gap: var(--spacing-xl);
 }
@@ -204,18 +235,21 @@ header h1 {
 .detail-item {
     display: flex;
     flex-direction: column;
+    gap: 0.25rem;
 }
 
 .detail-label {
-    font-size: 0.625rem;
+    font-size: 0.7rem;
     text-transform: uppercase;
     font-weight: 600;
+    letter-spacing: 0.05em;
     color: var(--color-text-secondary);
 }
 
 .detail-value {
-    font-weight: 600;
-    font-size: 0.875rem;
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--color-text-primary);
 }
 
 .download-buttons {
@@ -226,22 +260,28 @@ header h1 {
 .download-btn {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 0.5rem;
     text-decoration: none;
-    font-size: 0.8125rem;
+    font-size: 0.875rem;
     font-weight: 600;
-    padding: 0.5rem 1rem;
+    padding: 0.625rem 1.25rem;
     border-radius: var(--radius-md);
-    transition: opacity 0.15s;
+    transition: all 0.2s ease;
+    white-space: nowrap;
 }
 
 .cta-btn {
     background-color: var(--color-cta);
-    color: var(--color-text-primary);
+    color: #111827;
+    /* Ensure good contrast */
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .cta-btn:hover {
     background-color: var(--color-cta-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 /* ============================================

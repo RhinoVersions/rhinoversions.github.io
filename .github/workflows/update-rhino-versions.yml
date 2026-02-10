@@ -2,9 +2,8 @@ name: Update Rhino versions from NuGet (daily)
 
 on:
   schedule:
-    # Daily at 09:10 UTC (adjust as needed)
+    # Daily at 09:10 UTC
     - cron: "10 9 * * *"
-
   workflow_dispatch:
 
 permissions:
@@ -19,25 +18,26 @@ jobs:
       group: update-rhino-from-nuget
       cancel-in-progress: false
 
+    outputs:
+      changed: ${{ steps.commit.outputs.changed }}
+
     env:
-      # Track one or more majors; space- or comma-separated, e.g. "8 9" or "8,9"
       RHINO_MAJORS: "7,8"
-      # Support multiple locales for comprehensive language support
       RHINO_LOCALES: "en-us,de-de,es-es,fr-fr,it-it,ja-jp,ko-kr,zh-cn,zh-tw"
-      MD_PATH: "rhino-versions.md"         # newest-only (prepend if new) - en-us only with both platforms
-      MD_PATH_ALL: "rhino-versions-all.md" # all versions (overwrite) - all locales, both platforms
-      HEAD_CHECK_LATEST: "true"                  # require URL 200 for newest
-      HEAD_CHECK_ALL: "false"                    # require URL 200 for entries in -all (disabled for performance)
-      # Use WEBSITE_TOKEN if set, else GITHUB_TOKEN, else DEPLOY
+      MD_PATH: "rhino-versions.md"
+      MD_PATH_ALL: "rhino-versions-all.md"
+      HEAD_CHECK_LATEST: "true"
+      HEAD_CHECK_ALL: "false"
+      MAC_HEAD_LIMIT: "10"
       PUSH_TOKEN: ${{ secrets.WEBSITE_TOKEN || secrets.GITHUB_TOKEN || secrets.DEPLOY }}
 
     steps:
-      - name: Checkout dev branch (no persisted creds)
+      - name: Checkout (shallow)
         uses: actions/checkout@v4
         with:
           ref: main
-          fetch-depth: 0
-          persist-credentials: false  # we'll inject our own token later
+          fetch-depth: 1
+          persist-credentials: false
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -45,16 +45,21 @@ jobs:
           python-version: "3.11"
 
       - name: Install deps
-        run: |
-          python -m pip install --upgrade pip
-          pip install requests
+        run: pip install requests
 
+      # ── Phase 1: Lightweight check ──────────────────────────
+      - name: Quick check for new versions
+        id: check
+        run: python fetch_versions.py --check-only
+
+      # ── Phase 2: Full build (only if new versions exist) ────
       - name: Build latest + all versions files from NuGet
         id: build
-        run: |
-          python fetch_versions.py
+        if: steps.check.outputs.new_versions == 'true'
+        run: python fetch_versions.py
 
       - name: Job summary
+        if: steps.check.outputs.new_versions == 'true'
         run: |
           {
             echo "### Rhino update";
@@ -68,30 +73,38 @@ jobs:
             echo "- **Changed latest.md**: ${{ steps.build.outputs.changed }}";
           } >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Configure git (use PAT or GITHUB_TOKEN)
+      - name: Job summary (skipped)
+        if: steps.check.outputs.new_versions != 'true'
+        run: echo "### No new Rhino versions – skipped full build" >> "$GITHUB_STEP_SUMMARY"
+
+      # ── Commit & deploy ─────────────────────────────────────
+      - name: Configure git
+        if: steps.check.outputs.new_versions == 'true'
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git remote set-url origin https://x-access-token:${PUSH_TOKEN}@github.com/${{ github.repository }}.git
 
-      - name: Commit & push if changed (stage first)
+      - name: Commit & push if changed
+        id: commit
+        if: steps.check.outputs.new_versions == 'true'
         run: |
           set -e
-          # Always stage our targets (handles new/untracked files too)
           git add "$MD_PATH" "$MD_PATH_ALL"
 
-          # If nothing is staged for commit, bail out
           if git diff --cached --quiet -- "$MD_PATH" "$MD_PATH_ALL"; then
             echo "No changes to commit."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
           git commit -m "chore: update Rhino (${RHINO_MAJORS}) latest + all from NuGet (auto)"
-          # In case the branch moved, rebase then push
           git pull --rebase origin main || true
           git push origin HEAD:main
+          echo "changed=true" >> "$GITHUB_OUTPUT"
 
       - name: Upload Pages artifact
+        if: steps.commit.outputs.changed == 'true'
         uses: actions/upload-pages-artifact@v3
         with:
           path: .
@@ -102,6 +115,7 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     needs: update
+    if: needs.update.outputs.changed == 'true'
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
