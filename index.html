@@ -215,7 +215,11 @@
                     rel="noopener noreferrer">GitHub Actions</a></p>
             <p class="footer-note">Data sourced from <a href="https://www.nuget.org/packages/RhinoCommon"
                     target="_blank" rel="noopener noreferrer">NuGet RhinoCommon</a></p>
-            <p class="footer-version">__VERSION__</p>
+            <p class="footer-version" id="footer-version">__VERSION__</p>
+            <script>
+                var fv = document.getElementById('footer-version');
+                if (fv && fv.textContent.trim() === '__VERSION__') fv.style.display = 'none';
+            </script>
         </div>
     </footer>
 
