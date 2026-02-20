@@ -7,27 +7,66 @@
     <meta name="description"
         content="Download the latest Rhino 3D builds for Windows and Mac. Aggregated version history and direct download links for Rhinoceros 7 and 8, updated daily from NuGet.">
     <meta name="keywords"
-        content="rhino, rhino3d, rhinoceros, download rhino, rhino versions, rhino 8 download, rhino 7 download, cad, nuget, rhino build history">
-    <title>Rhino Versions | Latest Rhinoceros 3D Build Downloads & History</title>
-    <link rel="stylesheet" href="styles.css?v=20260210">
+        content="rhino, rhino3d, rhinoceros, download rhino, rhino versions, rhino 8 download, rhino 7 download, cad, nuget, rhino build history, rhino 3d, computational design, parametric design">
+
+    <title>Rhino Versions | Latest Rhinoceros 3D Build Downloads &amp; History</title>
+
+    <!-- Canonical -->
+    <link rel="canonical" href="https://rhinoversions.github.io">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:url" content="https://rhinoversions.github.io">
+    <meta property="og:site_name" content="Rhino Versions">
+    <meta property="og:title" content="Rhino Versions — Latest Rhinoceros 3D Build Downloads & History">
+    <meta property="og:description"
+        content="Download the latest Rhino 3D builds for Windows and Mac. Aggregated version history and direct download links for Rhinoceros 7 and 8.">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Rhino Versions — Latest Rhinoceros 3D Build Downloads">
+    <meta name="twitter:description"
+        content="Download the latest Rhino 3D builds for Windows and Mac. Aggregated version history updated daily from NuGet.">
+
+    <!-- Robots -->
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+
+    <!-- Fonts -->
+    <link rel="stylesheet" href="styles.css?v=20260219">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Rhino Versions",
+        "url": "https://rhinoversions.github.io",
+        "description": "Download the latest Rhino 3D builds for Windows and Mac. Aggregated version history and direct download links for Rhinoceros 7 and 8, updated daily from NuGet.",
+        "publisher": {
+            "@type": "Organization",
+            "name": "RhinoVersions"
+        }
+    }
+    </script>
 </head>
 
 <body>
-    <div class="background-gradient"></div>
-
     <header>
         <div class="container">
-            <!-- Logo Removed -->
-            <h1>
-                Rhino Versions
-            </h1>
-            <p class="tagline">Official Rhino 3D build downloads and version history, updated daily from NuGet.</p>
-
+            <div class="header-left">
+                <h1>Rhino Versions</h1>
+                <p class="tagline">Official Rhino 3D build downloads and version history, updated daily from NuGet.</p>
+            </div>
+            <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+                <span class="icon" id="theme-icon">🌙</span>
+                <span id="theme-label">Dark</span>
+            </button>
         </div>
     </header>
 
@@ -161,6 +200,7 @@
                     rel="noopener noreferrer">GitHub Actions</a></p>
             <p class="footer-note">Data sourced from <a href="https://www.nuget.org/packages/RhinoCommon"
                     target="_blank" rel="noopener noreferrer">NuGet RhinoCommon</a></p>
+            <p class="footer-version">__VERSION__</p>
         </div>
     </footer>
 

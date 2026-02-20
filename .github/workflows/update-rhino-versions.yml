@@ -103,11 +103,28 @@ jobs:
           git push origin HEAD:main
           echo "changed=true" >> "$GITHUB_OUTPUT"
 
+      - name: Generate Version Tag
+        id: version
+        run: echo "TAG_NAME=v$(date +'%Y.%m.%d').${{ github.run_number }}" >> $GITHUB_ENV
+
+      - name: Inject version into footer
+        if: steps.check.outputs.new_versions == 'true'
+        run: sed -i "s/__VERSION__/${{ env.TAG_NAME }}/g" index.html
+
       - name: Upload Pages artifact
         if: steps.commit.outputs.changed == 'true'
         uses: actions/upload-pages-artifact@v3
         with:
           path: .
+
+      - name: Create GitHub Release
+        if: steps.commit.outputs.changed == 'true'
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ env.TAG_NAME }}
+          name: Release ${{ env.TAG_NAME }}
+          body: "Automatic deployment release with latest Rhino version data."
+          token: ${{ secrets.GITHUB_TOKEN }}
 
   deploy:
     environment:

@@ -1,8 +1,8 @@
 /* ============================================
-   CSS Custom Properties (Design Tokens - RhinoPackages Style)
+   CSS Custom Properties (Design Tokens)
    ============================================ */
 :root {
-    /* Colors */
+    /* Colors - Light */
     --color-bg: #ffffff;
     --color-surface: #f9fafb;
     --color-text-primary: #111827;
@@ -11,9 +11,7 @@
 
     /* Accents */
     --color-accent: #3b82f6;
-    /* Blue for links/primary */
     --color-cta: #ffdd00;
-    /* Vibrant Yellow for CTA */
     --color-cta-hover: #fcd34d;
 
     /* Status */
@@ -42,6 +40,27 @@
     --radius-md: 6px;
     --radius-lg: 8px;
     --radius-full: 9999px;
+
+    /* Shadows */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+}
+
+/* ============================================
+   Dark Mode
+   ============================================ */
+[data-theme="dark"] {
+    --color-bg: #0d1117;
+    --color-surface: #18181b;
+    --color-text-primary: #e4e4e7;
+    --color-text-secondary: #a1a1aa;
+    --color-border: #27272a;
+    --color-accent: #60a5fa;
+    --color-cta: #facc15;
+    --color-cta-hover: #fde047;
+    --color-error: #f87171;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
 }
 
 /* ============================================
@@ -53,12 +72,27 @@
     box-sizing: border-box;
 }
 
+html {
+    overflow-x: hidden;
+}
+
 body {
     font-family: var(--font-body);
     background-color: var(--color-bg);
     color: var(--color-text-primary);
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+::selection {
+    background: #ec4899;
+    color: #fff;
+}
+
+a {
+    transition: color 0.15s ease;
 }
 
 .container {
@@ -74,6 +108,13 @@ header {
     background: var(--color-bg);
     border-bottom: 1px solid var(--color-border);
     padding: var(--spacing-md) 0;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+header .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 header h1 {
@@ -83,9 +124,40 @@ header h1 {
     letter-spacing: -0.02em;
 }
 
+.header-left {
+    display: flex;
+    flex-direction: column;
+}
+
 .tagline {
     font-size: 0.75rem;
     color: var(--color-text-secondary);
+}
+
+/* Theme Toggle */
+.theme-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-full);
+    padding: 0.375rem 0.75rem;
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-family: var(--font-body);
+    color: var(--color-text-secondary);
+    transition: all 0.2s ease;
+}
+
+.theme-toggle:hover {
+    border-color: var(--color-text-secondary);
+    color: var(--color-text-primary);
+}
+
+.theme-toggle .icon {
+    font-size: 1rem;
+    line-height: 1;
 }
 
 /* ============================================
@@ -131,14 +203,16 @@ header h1 {
     border-radius: var(--radius-md);
     font-size: var(--font-size-sm);
     font-family: var(--font-body);
-    transition: border-color 0.15s;
+    transition: border-color 0.15s, background-color 0.3s ease, color 0.3s ease;
     background-color: var(--color-bg);
+    color: var(--color-text-primary);
 }
 
 .search-input:focus,
 .filter-select:focus {
     outline: none;
-    border-color: var(--color-text-secondary);
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
 }
 
 .sidebar-footer {
@@ -147,6 +221,7 @@ header h1 {
     border-top: 1px solid var(--color-border);
     font-size: 0.75rem;
     color: var(--color-text-secondary);
+    transition: border-color 0.3s ease;
 }
 
 /* Main Content */
@@ -159,12 +234,12 @@ header h1 {
    Components
    ============================================ */
 
-/* Generic Card Replacement */
+/* Generic Card */
 .glass-card {
     background: var(--color-bg);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
-    transition: border-color 0.15s;
+    transition: border-color 0.15s, background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 /* Latest Release Card */
@@ -174,20 +249,17 @@ header h1 {
 
 .latest-card {
     padding: var(--spacing-xl);
-    /* Increased padding */
     display: flex;
     flex-direction: column;
     gap: var(--spacing-lg);
-    /* More breathing room */
     position: relative;
     border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
-    background: #ffffff;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-    /* Subtle lift */
+    background: var(--color-bg);
+    box-shadow: var(--shadow-md);
+    transition: all 0.3s ease;
 }
 
-/* Fallback for browsers that don't support gap in flexbox (very old, but safe) */
 .latest-card>* {
     margin-bottom: var(--spacing-lg);
 }
@@ -196,16 +268,12 @@ header h1 {
     margin-bottom: 0;
 }
 
-
-/* Badge styling */
+/* Badge */
 .latest-badge {
     align-self: flex-start;
     background: #FFFAE5;
-    /* Soft yellow bg */
     border: 1px solid #FCD34D;
-    /* Stronger yellow border */
     color: #92400E;
-    /* Dark amber text */
     font-size: 0.75rem;
     font-weight: 700;
     text-transform: uppercase;
@@ -214,27 +282,32 @@ header h1 {
     border-radius: var(--radius-full);
 }
 
+[data-theme="dark"] .latest-badge {
+    background: rgba(250, 204, 21, 0.12);
+    border-color: rgba(250, 204, 21, 0.3);
+    color: #fbbf24;
+}
+
 /* Version Header */
 .latest-card h2 {
     font-size: 2rem;
-    /* Larger title */
     font-weight: 800;
     color: var(--color-text-primary);
     line-height: 1.2;
     margin: 0;
 }
 
-/* Details and Buttons Row */
+/* Details */
 .version-details {
     display: flex;
     width: 100%;
     justify-content: space-between;
     align-items: flex-end;
-    /* Align bottom of text with buttons */
     gap: var(--spacing-lg);
     flex-wrap: wrap;
     padding-top: var(--spacing-md);
     border-top: 1px solid var(--color-border);
+    transition: border-color 0.3s ease;
 }
 
 .details-group {
@@ -284,8 +357,7 @@ header h1 {
 .cta-btn {
     background-color: var(--color-cta);
     color: #111827;
-    /* Ensure good contrast */
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--shadow-sm);
 }
 
 .cta-btn:hover {
@@ -295,7 +367,7 @@ header h1 {
 }
 
 /* ============================================
-   Versions Table (Flat List)
+   Versions Table
    ============================================ */
 .versions-section h2 {
     font-size: 0.875rem;
@@ -324,16 +396,23 @@ header h1 {
     font-weight: 600;
     color: var(--color-text-secondary);
     border-bottom: 1px solid var(--color-border);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .versions-table td {
     padding: 1rem;
     border-bottom: 1px solid var(--color-border);
     font-size: 0.875rem;
+    transition: background-color 0.15s ease, border-color 0.3s ease;
+}
+
+.versions-table tbody tr {
+    transition: all 0.15s ease;
 }
 
 .versions-table tbody tr:hover {
     background-color: var(--color-surface);
+    transform: translateX(2px);
 }
 
 .version-number {
@@ -354,10 +433,26 @@ header h1 {
     border-radius: 4px;
     font-size: 0.75rem;
     font-weight: 500;
+    transition: all 0.15s ease;
 }
 
 .table-download-btn:hover {
-    border-color: var(--color-text-secondary);
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+    background: rgba(59, 130, 246, 0.05);
+}
+
+[data-theme="dark"] .table-download-btn:hover {
+    background: rgba(96, 165, 250, 0.1);
+}
+
+/* Sortable headers */
+.sortable {
+    cursor: pointer;
+    user-select: none;
+}
+
+.sortable:hover {
     color: var(--color-text-primary);
 }
 
@@ -397,11 +492,22 @@ footer {
     text-align: center;
     font-size: 0.75rem;
     color: var(--color-text-secondary);
+    transition: border-color 0.3s ease;
 }
 
 footer a {
     color: var(--color-accent);
     text-decoration: none;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}
+
+.footer-version {
+    margin-top: 0.5rem;
+    font-size: 0.625rem;
+    opacity: 0.7;
 }
 
 /* ============================================
@@ -427,6 +533,7 @@ footer a {
         padding: var(--spacing-md);
         border-radius: var(--radius-md);
         border: 1px solid var(--color-border);
+        transition: background-color 0.3s ease, border-color 0.3s ease;
     }
 
     .sidebar-section {
@@ -457,11 +564,13 @@ footer a {
         right: 0.5rem;
         top: 0.5rem;
         font-size: 0.625rem;
-        background: rgba(255, 255, 255, 0.8);
+        background: var(--color-surface);
         padding: 2px 6px;
         border-radius: 4px;
         color: var(--color-text-secondary);
         pointer-events: none;
+        border: 1px solid var(--color-border);
+        transition: background-color 0.3s ease, border-color 0.3s ease;
     }
 }
 
