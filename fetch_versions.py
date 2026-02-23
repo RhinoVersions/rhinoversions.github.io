@@ -12,6 +12,7 @@ import requests
 # Configuration
 USER_AGENT = "nuget-rhino-actions/1.5"
 REG_INDEX = "https://api.nuget.org/v3/registration5-semver1/rhinocommon/index.json"
+MAC_RELEASE_URL_TEMPLATE = "https://files.mcneel.com/rhino/{major}/mac/releases/{filename}"
 STABLE_SUFFIX_RE = re.compile(r'^[0-9]+(\.[0-9]+){3}$')  # e.g., 8.24.25281.15001
 BULLET_RE = re.compile(r'^\s{4}- \[.*\]\(.*\)\s*$')
 
@@ -134,7 +135,7 @@ def build_mac_url_candidates(ver: str) -> List[str]:
     
     # Candidate 1: Exact match
     filename1 = f"rhino_{ver_name}.dmg"
-    url1 = f"https://files.mcneel.com/rhino/{major}/mac/releases/{filename1}"
+    url1 = MAC_RELEASE_URL_TEMPLATE.format(major=major, filename=filename1)
     candidates.append(url1)
     
     # Candidate 2: Last digit + 1
@@ -145,7 +146,7 @@ def build_mac_url_candidates(ver: str) -> List[str]:
         parts[3] = new_last_part
         ver_name_plus1 = ".".join(parts)
         filename2 = f"rhino_{ver_name_plus1}.dmg"
-        url2 = f"https://files.mcneel.com/rhino/{major}/mac/releases/{filename2}"
+        url2 = MAC_RELEASE_URL_TEMPLATE.format(major=major, filename=filename2)
         candidates.append(url2)
     except ValueError:
         pass
