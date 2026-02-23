@@ -23,6 +23,7 @@ const CONFIG = {
 
 // State
 let allVersions = [];
+let allVersionGroups = [];
 let currentSort = { column: 'date', ascending: false };
 let expandedVersionCards = new Set();
 let deepLinkState = {
@@ -287,6 +288,7 @@ async function loadAllVersions() {
         });
 
         allVersions = Array.from(versionMap.values());
+        allVersionGroups = groupVersions(allVersions);
 
         // Display
         filterVersions();
@@ -315,6 +317,7 @@ function displayVersions(versions) {
     const localeFilter = document.getElementById('locale-filter').value;
 
     listEl.innerHTML = '';
+    const fragment = document.createDocumentFragment();
 
     versions.forEach((versionGroup, index) => {
         const card = document.createElement('article');
@@ -383,8 +386,10 @@ function displayVersions(versions) {
             }
         });
 
-        listEl.appendChild(card);
+        fragment.appendChild(card);
     });
+
+    listEl.appendChild(fragment);
 
     countEl.textContent = `Showing ${versions.length} version${versions.length !== 1 ? 's' : ''}`;
     scrollToDeepLinkedRowIfNeeded();
@@ -398,7 +403,7 @@ function filterVersions() {
     const majorFilter = document.getElementById('major-filter').value;
     const localeFilter = document.getElementById('locale-filter').value;
 
-    let filtered = groupVersions(allVersions);
+    let filtered = allVersionGroups;
 
     // Filter by major version
     if (majorFilter !== 'all') {
@@ -647,6 +652,17 @@ function sortVersions(versions, column, ascending) {
 // ============================================
 
 /**
+ * Debounce function to limit rate of execution
+ */
+function debounce(func, wait) {
+    let timeout;
+    return function(...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), wait);
+    };
+}
+
+/**
  * Format date for display
  */
 function formatDate(date, monthStyle = 'long') {
@@ -858,7 +874,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadContributors();
 
     // Set up event listeners
-    document.getElementById('search-input').addEventListener('input', filterVersions);
+    document.getElementById('search-input').addEventListener('input', debounce(filterVersions, 300));
     document.getElementById('major-filter').addEventListener('change', filterVersions);
     document.getElementById('locale-filter').addEventListener('change', () => {
         // Reload latest version when locale changes
