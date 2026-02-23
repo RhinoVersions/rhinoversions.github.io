@@ -18,12 +18,12 @@ const CONFIG = {
     REPO_NAME: 'rhinoversions.github.io',
     BRANCH: 'main',
     LATEST_MD_PATH: 'rhino-versions.md',
-    ALL_MD_PATH: 'rhino-versions-all.md'
+    ALL_MD_PATH: 'rhino-versions-all.md',
+    DEFAULT_SORT: { column: 'date', ascending: false }
 };
 
 // State
 let allVersions = [];
-let currentSort = { column: 'date', ascending: false };
 let expandedVersionCards = new Set();
 let deepLinkState = {
     version: null,
@@ -426,7 +426,7 @@ function filterVersions() {
     }
 
     // Apply current sort
-    filtered = sortVersions(filtered, currentSort.column, currentSort.ascending);
+    filtered = sortVersions(filtered, CONFIG.DEFAULT_SORT.column, CONFIG.DEFAULT_SORT.ascending);
 
     displayVersions(filtered);
 }
