@@ -368,8 +368,8 @@ function displayVersions(versions) {
         card.innerHTML = `
             <div class="version-card-header" role="button" tabindex="0" aria-expanded="${isExpanded}">
                 <div class="version-card-main">
-                    <a href="${deepLinkHref}" class="version-link"><span class="version-number">${versionGroup.fullVersion}</span></a>
-                    <span class="major-badge">Rhino ${versionGroup.major}</span>
+                    <a href="${escapeHTML(deepLinkHref)}" class="version-link"><span class="version-number">${escapeHTML(versionGroup.fullVersion)}</span></a>
+                    <span class="major-badge">Rhino ${escapeHTML(versionGroup.major)}</span>
                 </div>
                 <div class="version-card-meta">
                     <span class="version-date">${formatDate(versionGroup.date, 'long')}</span>
@@ -566,7 +566,7 @@ function buildVersionCardRows(versionGroup, localeFilter) {
 
             rows.push(`
                 <div class="version-card-row">
-                    <span class="locale-badge">${entry.locale.toUpperCase()}</span>
+                    <span class="locale-badge">${escapeHTML(entry.locale.toUpperCase())}</span>
                     <div class="download-buttons-cell">${buttons}</div>
                 </div>
             `);
@@ -586,7 +586,7 @@ function buildVersionCardRows(versionGroup, localeFilter) {
                 const localeLabel = entry.locale === 'multi' ? 'MULTILINGUAL' : entry.locale.toUpperCase();
                 rows.push(`
                     <div class="version-card-row">
-                        <span class="locale-badge">${localeLabel}</span>
+                        <span class="locale-badge">${escapeHTML(localeLabel)}</span>
                         <div class="download-buttons-cell">${buttons}</div>
                     </div>
                 `);
@@ -673,6 +673,19 @@ function sortVersions(versions, column, ascending) {
 // ============================================
 // Utilities
 // ============================================
+
+/**
+ * Escape HTML special characters to prevent XSS
+ */
+function escapeHTML(str) {
+    if (typeof str !== 'string') return str;
+    return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
 
 /**
  * Debounce function to limit rate of execution

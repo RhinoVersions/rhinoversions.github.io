@@ -1,2 +1,4 @@
 .DS_Store
 anon.sh
+__pycache__/
+*.pyc
