@@ -46,12 +46,15 @@
     <link rel="dns-prefetch" href="https://raw.githubusercontent.com">
 
     <!-- Fonts -->
-    <link rel="stylesheet" href="styles.css?v=20260219">
+    <link rel="stylesheet" href="styles.css?v=20260219"
+        integrity="sha384-Dp1tdKdm9hjfU81Q86GroyoK0bgDZAx3cojWn/D7iTGY+egV926sD/yC8vYURCay">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Google Fonts uses dynamic CSS based on User-Agent, making SRI hashes unstable.
+         Added crossorigin for security best practices. -->
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap"
-        rel="stylesheet">
+        rel="stylesheet" crossorigin="anonymous">
 
     <!-- JSON-LD Structured Data -->
     <script type="application/ld+json">
@@ -214,7 +217,8 @@
     </footer>
 
 
-    <script src="script.js?v=20260220"></script>
+    <script src="script.js?v=20260220"
+        integrity="sha384-8DH/IpotwRYhLZhBWWLsCqnyHODbZivxcehjTkYxVRv2XRqIm7vn/9QnnHE1bOd+"></script>
 </body>
 
 </html>
