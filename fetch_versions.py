@@ -5,7 +5,7 @@ import re
 import sys
 import time
 from concurrent.futures import ThreadPoolExecutor
-from typing import List, Iterable, Tuple, Union, Optional
+from typing import List, Iterable, Tuple, Union
 from urllib.parse import urlparse
 import requests
 
