@@ -22,6 +22,10 @@
     <meta property="og:title" content="Rhino Versions — Latest Rhinoceros 3D Build Downloads & History">
     <meta property="og:description"
         content="Download the latest Rhino 3D builds for Windows and Mac. Aggregated version history and direct download links for Rhinoceros 7 and 8.">
+    <meta property="og:image" content="https://rhinoversions.github.io/logo.png">
+    <meta property="og:image:width" content="640">
+    <meta property="og:image:height" content="640">
+    <meta property="og:image:alt" content="Rhino Versions Logo">
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary">
@@ -31,10 +35,15 @@
 
     <!-- Robots -->
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="theme-color" content="#ffffff">
 
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="icon" type="image/png" sizes="any" href="logo.png">
     <link rel="apple-touch-icon" href="logo.png">
+
+    <!-- Preload -->
+    <link rel="preload" as="image" href="logo.png">
+    <link rel="dns-prefetch" href="https://raw.githubusercontent.com">
 
     <!-- Fonts -->
     <link rel="stylesheet" href="styles.css?v=20260219">
@@ -75,7 +84,7 @@
         <div class="container">
             <div class="header-left">
                 <a href="/" class="header-brand" aria-label="Rhino Versions Home">
-                    <img src="logo.png" alt="Rhino Versions Logo" class="header-logo">
+                    <img src="logo.png" alt="Rhino Versions Logo" class="header-logo" width="28" height="28">
                     <h1>Rhino Versions</h1>
                 </a>
                 <p class="tagline">Official Rhino 3D build downloads and version history, updated daily from NuGet.</p>

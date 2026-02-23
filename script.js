@@ -45,6 +45,40 @@ function isLocalEnvironment() {
 }
 
 /**
+ * Fetch with localStorage cache
+ */
+const CACHE_KEY_PREFIX = 'rhino_versions_cache_';
+const CACHE_EXPIRY_MS = 6 * 60 * 60 * 1000; // 6 hours
+
+async function fetchWithCache(url) {
+    const cacheKey = CACHE_KEY_PREFIX + url;
+    try {
+        const cached = localStorage.getItem(cacheKey);
+        if (cached) {
+            const { timestamp, data } = JSON.parse(cached);
+            if (Date.now() - timestamp < CACHE_EXPIRY_MS) {
+                return data;
+            }
+        }
+    } catch (e) {
+        console.warn('Cache retrieval failed:', e);
+    }
+
+    const response = await fetch(url);
+    if (!response.ok) {
+        throw new Error(`Failed to fetch ${url}: ${response.status} ${response.statusText}`);
+    }
+    const text = await response.text();
+
+    try {
+        localStorage.setItem(cacheKey, JSON.stringify({ timestamp: Date.now(), data: text }));
+    } catch (e) {
+        console.warn('Failed to cache data:', e);
+    }
+    return text;
+}
+
+/**
  * Fetch markdown file from GitHub raw content or local file
  */
 async function fetchMarkdownFromGitHub(path) {
@@ -62,13 +96,7 @@ async function fetchMarkdownFromGitHub(path) {
 
     // Otherwise, fetch from GitHub raw content
     const url = `https://raw.githubusercontent.com/${CONFIG.REPO_OWNER}/${CONFIG.REPO_NAME}/${CONFIG.BRANCH}/${path}`;
-    const response = await fetch(url);
-
-    if (!response.ok) {
-        throw new Error(`Failed to fetch ${path}: ${response.status} ${response.statusText}`);
-    }
-
-    return await response.text();
+    return await fetchWithCache(url);
 }
 
 /**
@@ -647,6 +675,21 @@ function sortVersions(versions, column, ascending) {
 // ============================================
 
 /**
+ * Debounce function to limit rate of execution
+ */
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+/**
  * Format date for display
  */
 function formatDate(date, monthStyle = 'long') {
@@ -858,7 +901,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadContributors();
 
     // Set up event listeners
-    document.getElementById('search-input').addEventListener('input', filterVersions);
+    document.getElementById('search-input').addEventListener('input', debounce(filterVersions, 300));
     document.getElementById('major-filter').addEventListener('change', filterVersions);
     document.getElementById('locale-filter').addEventListener('change', () => {
         // Reload latest version when locale changes
