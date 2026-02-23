@@ -106,6 +106,21 @@ class FetchVersionsTests(unittest.TestCase):
             self.assertEqual(count, 2)
             self.assertTrue(md_all.read_text(encoding="utf-8").strip().startswith("- [rhino_en-us_8.24.25281.15001.exe]"))
 
+    @patch("fetch_versions.fetch_registration_index")
+    @patch("fetch_versions.versions_from_registration")
+    @patch("fetch_versions.list_stable_for_majors")
+    def test_get_stable_versions_orchestration(self, mock_list_stable, mock_versions_from_reg, mock_fetch_reg):
+        mock_fetch_reg.return_value = {"some": "data"}
+        mock_versions_from_reg.return_value = ["v1", "v2"]
+        mock_list_stable.return_value = ["v1"]
+
+        stable = fv.get_stable_versions()
+
+        mock_fetch_reg.assert_called_once()
+        mock_versions_from_reg.assert_called_once_with({"some": "data"})
+        mock_list_stable.assert_called_once_with(["v1", "v2"], fv.MAJORS)
+        self.assertEqual(stable, ["v1"])
+
 
 if __name__ == "__main__":
     unittest.main()

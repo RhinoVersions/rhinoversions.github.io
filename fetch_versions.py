@@ -219,12 +219,17 @@ def write_all(md_path_all: str, entries: List[Tuple[str, str]]) -> int:
     return len(entries)
 
 
+def get_stable_versions() -> List[str]:
+    """Fetch all stable versions for configured majors from NuGet."""
+    reg = fetch_registration_index()
+    versions = versions_from_registration(reg)
+    return list_stable_for_majors(versions, MAJORS)
+
+
 def check_only():
     """Lightweight check: is the latest NuGet version already in our data?"""
     try:
-        reg = fetch_registration_index()
-        versions = versions_from_registration(reg)
-        stable = list_stable_for_majors(versions, MAJORS)
+        stable = get_stable_versions()
 
         if not stable:
             print("No stable versions found on NuGet.")
@@ -271,9 +276,7 @@ def main():
 
     try:
         # 1. Fetch available versions from NuGet
-        reg = fetch_registration_index()
-        versions = versions_from_registration(reg)
-        stable = list_stable_for_majors(versions, MAJORS)
+        stable = get_stable_versions()
 
         if not stable:
             print(f"::notice::No stable Rhino versions for majors: {', '.join(map(str, MAJORS))}.")
