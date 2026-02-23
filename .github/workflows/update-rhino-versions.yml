@@ -80,6 +80,14 @@ jobs:
         if: steps.check.outputs.new_versions != 'true'
         run: echo "### No new Rhino versions – skipped full build" >> "$GITHUB_STEP_SUMMARY"
 
+      - name: Install Playwright & Browsers
+        run: |
+          pip install playwright
+          playwright install chromium
+
+      - name: Run frontend verification
+        run: python -m unittest tests/ui_test.py
+
       # ── Commit & deploy ─────────────────────────────────────
       - name: Configure git
         if: steps.check.outputs.new_versions == 'true'
