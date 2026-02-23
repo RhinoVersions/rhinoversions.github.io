@@ -116,7 +116,8 @@ jobs:
 
       - name: Generate Version Tag
         id: version
-        run: echo "TAG_NAME=v$(date +'%Y.%m.%d').${{ github.run_number }}" >> $GITHUB_ENV
+        if: steps.check.outputs.new_versions == 'true'
+        run: echo "TAG_NAME=v${{ steps.build.outputs.version }}" >> $GITHUB_ENV
 
       - name: Inject version into footer
         if: steps.check.outputs.new_versions == 'true'

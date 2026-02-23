@@ -85,8 +85,14 @@ def parse_version_tuple(ver: str) -> Tuple[int, ...]:
 def list_stable_for_majors(all_versions: List[str], majors: Iterable[Union[int, str]]) -> List[str]:
     """Filter for stable versions matching the requested major versions."""
     majors_set = {str(m) for m in majors}
-    cands = [v for v in all_versions if STABLE_SUFFIX_RE.match(v)]
-    cands = [v for v in cands if v.split(".", 1)[0] in majors_set]
+    prefixes = tuple(f"{m}." for m in majors_set)
+    cands = [
+        v for v in all_versions
+        # Optimization: fast pre-filter. Safe because STABLE_SUFFIX_RE enforces dots.
+        if v.startswith(prefixes)
+        and STABLE_SUFFIX_RE.match(v)
+        and v.split(".", 1)[0] in majors_set
+    ]
     cands.sort(key=parse_version_tuple, reverse=True)
     return cands
 
