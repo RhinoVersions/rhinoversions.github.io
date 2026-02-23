@@ -87,7 +87,7 @@ body {
 }
 
 ::selection {
-    background: #ec4899;
+    background: var(--color-accent);
     color: #fff;
 }
 
