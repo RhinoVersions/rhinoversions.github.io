@@ -30,6 +30,9 @@ let deepLinkState = {
     locale: null,
     hasAutoScrolled: false
 };
+let cachedSearchInput = null;
+let cachedMajorFilter = null;
+let cachedLocaleFilter = null;
 
 // ============================================
 // Data Fetching & Parsing
@@ -422,9 +425,9 @@ function displayVersions(versions) {
  * Filter versions based on search, major version, and locale
  */
 function filterVersions() {
-    const searchTerm = document.getElementById('search-input').value.toLowerCase();
-    const majorFilter = document.getElementById('major-filter').value;
-    const localeFilter = document.getElementById('locale-filter').value;
+    const searchTerm = cachedSearchInput.value.toLowerCase();
+    const majorFilter = cachedMajorFilter.value;
+    const localeFilter = cachedLocaleFilter.value;
 
     let filtered = groupVersions(allVersions);
 
@@ -889,6 +892,10 @@ async function loadContributors() {
 // ============================================
 
 document.addEventListener('DOMContentLoaded', () => {
+    cachedSearchInput = document.getElementById('search-input');
+    cachedMajorFilter = document.getElementById('major-filter');
+    cachedLocaleFilter = document.getElementById('locale-filter');
+
     deepLinkState = parseDeepLinkFromUrl();
     applyDeepLinkToFilters();
 
