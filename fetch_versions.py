@@ -4,6 +4,7 @@ import os
 import re
 import sys
 import time
+from concurrent.futures import ThreadPoolExecutor
 from typing import List, Iterable, Tuple, Union, Optional
 from urllib.parse import urlparse
 import requests
@@ -45,15 +46,28 @@ def fetch_registration_index() -> dict:
 
 def versions_from_registration(reg_json: dict) -> List[str]:
     """Extract all versions from the registration index."""
-    versions = []
-    for page in reg_json.get("items", []):
+    pages = reg_json.get("items", [])
+
+    def get_items_from_page(page: dict) -> List[dict]:
         items = page.get("items")
-        if items is None:
-            page_url = page.get("@id")
-            print(f"Fetching page: {page_url}")
-            pr = requests.get(page_url, timeout=30, headers={"User-Agent": USER_AGENT})
-            pr.raise_for_status()
-            items = pr.json().get("items", [])
+        if items is not None:
+            return items
+
+        page_url = page.get("@id")
+        if not page_url:
+            return []
+
+        print(f"Fetching page: {page_url}")
+        pr = requests.get(page_url, timeout=30, headers={"User-Agent": USER_AGENT})
+        pr.raise_for_status()
+        return pr.json().get("items", [])
+
+    # Fetch pages concurrently while maintaining order
+    with ThreadPoolExecutor(max_workers=10) as executor:
+        pages_items = list(executor.map(get_items_from_page, pages))
+
+    versions = []
+    for items in pages_items:
         for leaf in items:
             ver = (leaf.get("catalogEntry") or {}).get("version")
             if ver:
