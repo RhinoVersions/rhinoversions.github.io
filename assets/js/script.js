@@ -22,6 +22,14 @@ const CONFIG = {
     DEFAULT_SORT: { column: 'date', ascending: false }
 };
 
+// Pre-compiled regular expressions for performance
+const REGEX = {
+    MARKDOWN_LINK: /- \[([^\]]+)\]\(([^)]+)\)/g,
+    FILENAME_EXTENSION: /\.(exe|dmg)$/,
+    VERSION_SANITIZE: /[^\d.]/g,
+    VERSION_PATTERN: /^\d+(\.\d+){1,3}$/
+};
+
 // State
 let allVersions = [];
 let expandedVersionCards = new Set();
@@ -109,11 +117,10 @@ async function fetchMarkdownFromGitHub(path) {
  * Returns array of { filename, url }
  */
 function parseMarkdownLinks(markdown) {
-    const linkRegex = /- \[([^\]]+)\]\(([^)]+)\)/g;
     const links = [];
-    let match;
+    const matches = markdown.matchAll(REGEX.MARKDOWN_LINK);
 
-    while ((match = linkRegex.exec(markdown)) !== null) {
+    for (const match of matches) {
         links.push({
             filename: match[1],
             url: match[2]
@@ -129,7 +136,7 @@ function parseMarkdownLinks(markdown) {
  */
 function parseVersionFromFilename(filename) {
     // Remove .exe or .dmg extension
-    const nameWithoutExt = filename.replace(/\.(exe|dmg)$/, '');
+    const nameWithoutExt = filename.replace(REGEX.FILENAME_EXTENSION, '');
 
     // Split by underscore
     const parts = nameWithoutExt.split('_');
@@ -731,12 +738,11 @@ function parseDeepLinkFromUrl() {
     const params = new URLSearchParams(window.location.search);
     const versionParam = params.get('version')?.trim() || null;
     const localeParam = params.get('locale')?.trim().toLowerCase() || null;
-    const normalizedVersion = versionParam?.replace(/[^\d.]/g, '') || null;
+    const normalizedVersion = versionParam?.replace(REGEX.VERSION_SANITIZE, '') || null;
     // Accept partial versions (e.g. 8.18) and full versions (e.g. 8.18.25100.11001)
-    const versionPattern = /^\d+(\.\d+){1,3}$/;
 
     return {
-        version: normalizedVersion && versionPattern.test(normalizedVersion) ? normalizedVersion : null,
+        version: normalizedVersion && REGEX.VERSION_PATTERN.test(normalizedVersion) ? normalizedVersion : null,
         locale: localeParam
     };
 }
