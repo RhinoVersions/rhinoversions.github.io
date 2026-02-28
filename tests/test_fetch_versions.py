@@ -125,6 +125,16 @@ class FetchVersionsTests(unittest.TestCase):
         mock_list_stable.assert_called_once_with(["v1", "v2"], fv.MAJORS)
         self.assertEqual(stable, ["v1"])
 
+    def test_version_for_filename(self):
+        # Valid 4-part version (already padded)
+        self.assertEqual(fv._version_for_filename("8.24.25281.15001"), "8.24.25281.15001")
+        # Valid 4-part version (needs padding)
+        self.assertEqual(fv._version_for_filename("8.24.1.2"), "8.24.00001.00002")
+        # Invalid version (fewer than 4 parts)
+        with self.assertRaises(ValueError) as cm:
+            fv._version_for_filename("1.2.3")
+        self.assertEqual(str(cm.exception), "Unexpected version: 1.2.3")
+
 
 if __name__ == "__main__":
     unittest.main()
