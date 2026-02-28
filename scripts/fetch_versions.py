@@ -351,16 +351,6 @@ def main():
             # Sort by version (descending), then by filename (to group locales)
             # Actually, the map keys are filenames.
             # We want to preserve the version order.
-            # Reconstruct list based on 'stable' list order
-            
-            final_entries = []
-            for v in stable:
-                # Find all files associated with this version (or close to it for Mac)
-                # This is a bit tricky since Mac version might be +1.
-                # Let's just iterate the map and sort.
-                pass
-            
-            # Simpler: just sort the map items. 
             # Filenames start with rhino_...
             # We want newest versions first.
             # Filenames contain version numbers, but sorting by string might be slightly off if padding differs (but we padded).
