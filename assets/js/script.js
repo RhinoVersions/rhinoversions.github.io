@@ -259,12 +259,12 @@ async function loadLatestVersion() {
         const macBtn = document.getElementById('latest-download-mac');
 
         if (windowsLink) {
-            windowsBtn.href = windowsLink.url;
+            windowsBtn.href = sanitizeUrl(windowsLink.url);
             windowsBtn.style.display = 'inline-block';
         }
 
         if (macLink) {
-            macBtn.href = macLink.url;
+            macBtn.href = sanitizeUrl(macLink.url);
             macBtn.style.display = 'inline-block';
         }
 
@@ -377,7 +377,7 @@ function displayVersions(versions) {
         card.innerHTML = `
             <div class="version-card-header" role="button" tabindex="0" aria-expanded="${isExpanded}">
                 <div class="version-card-main">
-                    <a href="${escapeHTML(deepLinkHref)}" class="version-link"><span class="version-number">${escapeHTML(versionGroup.fullVersion)}</span></a>
+                    <a href="${sanitizeUrl(deepLinkHref)}" class="version-link"><span class="version-number">${escapeHTML(versionGroup.fullVersion)}</span></a>
                     <span class="major-badge">Rhino ${escapeHTML(versionGroup.major)}</span>
                 </div>
                 <div class="version-card-meta">
@@ -569,10 +569,10 @@ function buildVersionCardRows(versionGroup, localeFilter) {
         localizedEntries.forEach(entry => {
             let buttons = '';
             if (entry.windowsUrl) {
-                buttons += `<a href="${entry.windowsUrl}" class="table-download-btn" target="_blank" rel="noopener noreferrer">${PLATFORM_ICONS.windows}<span class="label-full">Windows</span><span class="label-short">Win</span></a>`;
+                buttons += `<a href="${sanitizeUrl(entry.windowsUrl)}" class="table-download-btn" target="_blank" rel="noopener noreferrer">${PLATFORM_ICONS.windows}<span class="label-full">Windows</span><span class="label-short">Win</span></a>`;
             }
             if (entry.macUrl || macFallback?.macUrl) {
-                buttons += `<a href="${entry.macUrl || macFallback.macUrl}" class="table-download-btn" target="_blank" rel="noopener noreferrer">${PLATFORM_ICONS.mac}Mac</a>`;
+                buttons += `<a href="${sanitizeUrl(entry.macUrl || macFallback.macUrl)}" class="table-download-btn" target="_blank" rel="noopener noreferrer">${PLATFORM_ICONS.mac}Mac</a>`;
             }
 
             rows.push(`
@@ -588,10 +588,10 @@ function buildVersionCardRows(versionGroup, localeFilter) {
             .forEach(entry => {
                 let buttons = '';
                 if (entry.windowsUrl) {
-                    buttons += `<a href="${entry.windowsUrl}" class="table-download-btn" target="_blank" rel="noopener noreferrer">${PLATFORM_ICONS.windows}<span class="label-full">Windows</span><span class="label-short">Win</span></a>`;
+                    buttons += `<a href="${sanitizeUrl(entry.windowsUrl)}" class="table-download-btn" target="_blank" rel="noopener noreferrer">${PLATFORM_ICONS.windows}<span class="label-full">Windows</span><span class="label-short">Win</span></a>`;
                 }
                 if (entry.macUrl) {
-                    buttons += `<a href="${entry.macUrl}" class="table-download-btn" target="_blank" rel="noopener noreferrer">${PLATFORM_ICONS.mac}Mac</a>`;
+                    buttons += `<a href="${sanitizeUrl(entry.macUrl)}" class="table-download-btn" target="_blank" rel="noopener noreferrer">${PLATFORM_ICONS.mac}Mac</a>`;
                 }
 
                 const localeLabel = entry.locale === 'multi' ? 'MULTILINGUAL' : entry.locale.toUpperCase();
@@ -696,6 +696,34 @@ function escapeHTML(str) {
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
+}
+
+/**
+ * Sanitize a URL to prevent XSS (e.g. javascript: protocols)
+ */
+function sanitizeUrl(url) {
+    if (!url) return 'javascript:void(0)';
+
+    const trimmedUrl = url.trim();
+    const lowerUrl = trimmedUrl.toLowerCase();
+
+    // Check for dangerous protocols
+    if (lowerUrl.startsWith('javascript:') || lowerUrl.startsWith('data:') || lowerUrl.startsWith('vbscript:')) {
+        console.warn('Blocked potentially malicious URL:', trimmedUrl);
+        return 'javascript:void(0)';
+    }
+
+    // Only allow http:, https:, or relative/same-origin paths (?, #, /)
+    if (lowerUrl.startsWith('http://') ||
+        lowerUrl.startsWith('https://') ||
+        trimmedUrl.startsWith('?') ||
+        trimmedUrl.startsWith('#') ||
+        trimmedUrl.startsWith('/')) {
+        return escapeHTML(trimmedUrl);
+    }
+
+    console.warn('Blocked URL with non-approved protocol:', trimmedUrl);
+    return 'javascript:void(0)';
 }
 
 /**
@@ -877,7 +905,7 @@ async function loadContributors() {
             if (user.type === 'Bot') return;
 
             const bubble = document.createElement('a');
-            bubble.href = user.html_url;
+            bubble.href = sanitizeUrl(user.html_url);
             bubble.className = 'contributor-bubble';
             bubble.target = '_blank';
             bubble.rel = 'noopener noreferrer';
@@ -955,6 +983,7 @@ if (typeof module !== 'undefined' && module.exports) {
         compareFullVersions,
         formatDate,
         resolveTheme,
-        getVersionBuildKey
+        getVersionBuildKey,
+        sanitizeUrl
     };
 }

@@ -6,7 +6,8 @@ const {
     compareFullVersions,
     formatDate,
     resolveTheme,
-    getVersionBuildKey
+    getVersionBuildKey,
+    sanitizeUrl
 } = require('../assets/js/script.js');
 
 // Mock window for resolveTheme
@@ -101,5 +102,44 @@ test('getVersionBuildKey', async (t) => {
     await t.test('should return major.minor', () => {
         assert.strictEqual(getVersionBuildKey('8.24.25281.15001'), '8.24');
         assert.strictEqual(getVersionBuildKey('7.31.25281.15001'), '7.31');
+    });
+});
+
+test('sanitizeUrl', async (t) => {
+    await t.test('should allow valid https URLs', () => {
+        const url = 'https://files.mcneel.com/rhino/8/mac/releases/rhino_8.28.26041.11002.dmg';
+        assert.strictEqual(sanitizeUrl(url), url);
+    });
+
+    await t.test('should allow valid http URLs', () => {
+        const url = 'http://example.com/file.exe';
+        assert.strictEqual(sanitizeUrl(url), url);
+    });
+
+    await t.test('should allow relative URLs and query params', () => {
+        assert.strictEqual(sanitizeUrl('?version=8.28'), '?version=8.28');
+        assert.strictEqual(sanitizeUrl('/path/to/resource'), '/path/to/resource');
+        assert.strictEqual(sanitizeUrl('#anchor'), '#anchor');
+    });
+
+    await t.test('should block javascript: URLs', () => {
+        const malicious = 'javascript:alert("XSS")';
+        assert.strictEqual(sanitizeUrl(malicious), 'javascript:void(0)');
+    });
+
+    await t.test('should block data: URLs', () => {
+        const malicious = 'data:text/html,<script>alert(1)</script>';
+        assert.strictEqual(sanitizeUrl(malicious), 'javascript:void(0)');
+    });
+
+    await t.test('should block vbscript: URLs', () => {
+        const malicious = 'vbscript:msgbox("XSS")';
+        assert.strictEqual(sanitizeUrl(malicious), 'javascript:void(0)');
+    });
+
+    await t.test('should escape HTML in valid URLs', () => {
+        const urlWithSpecialChars = 'https://example.com/path?param=value&other="quote"';
+        const expected = 'https://example.com/path?param=value&amp;other=&quot;quote&quot;';
+        assert.strictEqual(sanitizeUrl(urlWithSpecialChars), expected);
     });
 });

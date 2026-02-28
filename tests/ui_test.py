@@ -38,7 +38,11 @@ class FrontendTests(unittest.TestCase):
             browser = p.chromium.launch()
             page = browser.new_page()
             try:
-                page.goto(f"http://localhost:{PORT}")
+                # Block external font requests to avoid timeouts
+                page.route("**/fonts.googleapis.com/**", lambda route: route.abort())
+                page.route("**/fonts.gstatic.com/**", lambda route: route.abort())
+
+                page.goto(f"http://localhost:{PORT}", wait_until="domcontentloaded")
 
                 # check title
                 self.assertIn("Rhino Versions", page.title())
